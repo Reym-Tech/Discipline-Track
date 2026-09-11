@@ -1,0 +1,120 @@
+{
+  "records": [
+    {
+      "student_id": 1001,
+      "name": "Ada Lovelace",
+      "course": "BSIT-1A",
+      "total_demerits": 1,
+      "status": "Warned",
+      "history": [
+        {
+          "code": "SMOKE",
+          "points": 1,
+          "description": "Smoking near lab"
+        }
+      ]
+    },
+    {
+      "student_id": 1002,
+      "name": "Bob Santos",
+      "course": "BSIT-1A",
+      "total_demerits": 3,
+      "status": "Suspended",
+      "history": [
+        {
+          "code": "CUTTING",
+          "points": 2,
+          "description": "Skipped IT lab"
+        },
+        {
+          "code": "SMOKE",
+          "points": 1,
+          "description": "No ID worn"
+        }
+      ]
+    },
+    {
+      "student_id": 1003,
+      "name": "Cid Reyes",
+      "course": "BSIT-2B",
+      "total_demerits": 3,
+      "status": "Suspended",
+      "history": [
+        {
+          "code": "CHEAT",
+          "points": 3,
+          "description": "Quiz cheating"
+        }
+      ]
+    },
+    {
+      "student_id": 1004,
+      "name": "Dana Cruz",
+      "course": "BSIT-2B",
+      "total_demerits": 4,
+      "status": "Lab Banned",
+      "history": [
+        {
+          "code": "PLAGIARISM",
+          "points": 4,
+          "description": "Copied lab output"
+        }
+      ]
+    },
+    {
+      "student_id": 1005,
+      "name": "Eli Ramos",
+      "course": "BSIT-3A",
+      "total_demerits": 5,
+      "status": "Expelled",
+      "history": [
+        {
+          "code": "HACK",
+          "points": 5,
+          "description": "Portal probe attempt"
+        }
+      ]
+    },
+    {
+      "student_id": 1006,
+      "name": "Faye Aquino",
+      "course": "BSIT-3A",
+      "total_demerits": 1,
+      "status": "Warned",
+      "history": [
+        {
+          "code": "NOID",
+          "points": 1,
+          "description": "No ID worn"
+        }
+      ]
+    },
+    {
+      "student_id": 1007,
+      "name": "Gus Lim",
+      "course": "BSIT-1B",
+      "total_demerits": 5,
+      "status": "Expelled",
+      "history": [
+        {
+          "code": "CUTTING",
+          "points": 2,
+          "description": "Cutting class"
+        },
+        {
+          "code": "CHEAT",
+          "points": 3,
+          "description": "Quiz cheating"
+        }
+      ]
+    },
+    {
+      "student_id": 1008,
+      "name": "Hana Uy",
+      "course": "BSIT-1B",
+      "total_demerits": 0,
+      "status": "Good Standing",
+      "history": []
+    }
+  ]
+}
