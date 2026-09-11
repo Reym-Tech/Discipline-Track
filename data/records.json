@@ -65,13 +65,18 @@
       "student_id": 1005,
       "name": "Eli Ramos",
       "course": "BSIT-3A",
-      "total_demerits": 5,
+      "total_demerits": 8,
       "status": "Expelled",
       "history": [
         {
           "code": "HACK",
           "points": 5,
           "description": "Portal probe attempt"
+        },
+        {
+          "code": "CHEAT",
+          "points": 3,
+          "description": "Cheating with Reuel Lambac"
         }
       ]
     },

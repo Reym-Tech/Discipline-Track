@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Discipline audit · Discipline-Track{% endblock %}
+{% block content %}
+<h1>Discipline audit</h1>
+<p class="lede">Every student ordered by demerits, then ID. Select View on any row for full history.</p>
+
+<ul class="chips" aria-label="Summary">
+  <li><strong>{{ total }}</strong> students</li>
+  <li><strong>{{ at_risk }}</strong> at 3+ demerits</li>
+  <li>Showing <strong id="shown-count">{{ rendered }}</strong> of <strong id="match-count">{{ total }}</strong></li>
+</ul>
+
+<form id="filter-form" class="filter-row">
+  <div class="field">
+    <label for="min">Minimum demerits</label>
+    <input id="min" name="min" type="number" min="0" value="0" inputmode="numeric">
+  </div>
+  <div class="field">
+    <label for="limit">Row limit</label>
+    <input id="limit" name="limit" type="number" min="1" max="5000" value="500" inputmode="numeric">
+  </div>
+  <button type="submit" class="btn">Apply filter</button>
+  <p id="filter-error" class="inline-error" role="alert" hidden></p>
+</form>
+
+<div class="split">
+  <section aria-label="Audit table">
+    <table id="audit-table">
+      <thead>
+        <tr><th scope="col" class="num">ID</th><th scope="col">Name</th><th scope="col">Course</th><th scope="col" class="num">Demerits</th><th scope="col">Status</th><th scope="col"><span class="visually-hidden">Detail</span></th></tr>
+      </thead>
+      <tbody id="audit-body">
+        {% for r in rows %}
+        <tr data-sid="{{ r.student_id }}">
+          <td class="num">{{ r.student_id }}</td>
+          <td>{{ r.name }}</td>
+          <td>{{ r.course }}</td>
+          <td class="num">{{ r.total_demerits }}</td>
+          <td><span class="pill {{ r.status|lower|replace(' ', '-') }}">{{ r.status }}</span></td>
+          <td><button type="button" class="btn btn-small view-btn" data-sid="{{ r.student_id }}">View</button></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="empty">No students on file yet. Register one from the Log violation screen.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p id="table-note" class="note" {% if rendered >= total %}hidden{% endif %}>Server-rendered first {{ rendered }} rows; use the filter to narrow large sets.</p>
+  </section>
+
+  <aside id="detail" class="detail" aria-label="Student detail" aria-live="polite">
+    <h2>Student detail</h2>
+    <p id="detail-empty" class="note">Nothing selected. Use View on any row.</p>
+    <div id="detail-body" hidden>
+      <p class="detail-head"><strong id="d-name"></strong> <span id="d-id" class="muted"></span></p>
+      <p id="d-meta" class="muted"></p>
+      <p id="d-status"></p>
+      <h3>Violation history</h3>
+      <ul id="d-history" class="history"></ul>
+    </div>
+    <p id="detail-error" class="inline-error" role="alert" hidden></p>
+  </aside>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='app.js') }}" defer></script>{% endblock %}

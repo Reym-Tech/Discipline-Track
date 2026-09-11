@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Discipline-Track{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <span class="brand">Discipline-Track</span>
+      <nav aria-label="Primary">
+        <a href="{{ url_for('audit_page') }}" class="{% if request.path == '/' %}current{% endif %}">Audit</a>
+        <a href="{{ url_for('log_page') }}" class="{% if request.path == '/log' %}current{% endif %}">Log violation</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="wrap footer">
+    <p>Records persist to the shared JSON file, so the terminal and web views stay in sync.</p>
+  </footer>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
