@@ -19,6 +19,8 @@ SEED_STUDENTS = [
     (1006, "Faye Aquino", "BSIT-3A"),
     (1007, "Gus Lim", "BSIT-1B"),
     (1008, "Hana Uy", "BSIT-1B"),
+    # Proposal demo case: 4 prior demerits so Guard's NOID (+1) triggers review.
+    (63326, "John Doe", "BSIT-1A"),
 ]
 
 SEED_VIOLATIONS = [
@@ -28,6 +30,7 @@ SEED_VIOLATIONS = [
     (1003, "CHEAT", "Quiz cheating"),
     (1004, "PLAGIARISM", "Copied lab output"),
     (1005, "HACK", "Portal probe attempt"),
+    (1005, "CHEAT", "Cheating with Reuel Lambac"),
     (1006, "NOID", "No ID worn"),
     (1007, "CUTTING", "Cutting class"),
     (1007, "CHEAT", "Quiz cheating"),
@@ -37,9 +40,18 @@ SEED_VIOLATIONS = [
 def build() -> DisciplineLedger:
     ledger = DisciplineLedger()
     for sid, name, course in SEED_STUDENTS:
-        ledger.register_student(sid, name, course)
+        if sid == 63326:
+            ledger.register_student(
+                sid, name, course,
+                parent_name="Jane Doe", emergency_contact="+63-900-000-0000",
+            )
+        else:
+            ledger.register_student(sid, name, course)
     for sid, code, desc in SEED_VIOLATIONS:
         ledger.log_violation(sid, code, desc)
+    # John Doe: 4 prior demerits (plagiarism) — guard's NOID demo takes him to 5.
+    ledger.log_violation(63326, "PLAGIARISM", "Prior coding plagiarism",
+                         reporter="System Seed", location="IT Lab")
     return ledger
 
 

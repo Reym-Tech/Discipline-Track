@@ -2,7 +2,10 @@
 {% block title %}Discipline audit · Discipline-Track{% endblock %}
 {% block content %}
 <h1>Discipline audit</h1>
-<p class="lede">Every student ordered by demerits, then ID. Select View on any row for full history.</p>
+<p class="lede">Highest demerits first. Select View on any row for full history.</p>
+{% if critical %}
+<div class="banner" role="alert">CRITICAL ALERT: {{ critical.student_id }} — {{ critical.name }} ({{ critical.total_demerits }} demerits) — {{ critical.status }}</div>
+{% endif %}
 
 <ul class="chips" aria-label="Summary">
   <li><strong>{{ total }}</strong> students</li>

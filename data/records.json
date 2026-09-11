@@ -6,11 +6,21 @@
       "course": "BSIT-1A",
       "total_demerits": 1,
       "status": "Warned",
+      "parent_name": "",
+      "emergency_contact": "",
+      "meeting_date": "",
+      "counseling_note": "",
+      "dean_approved": false,
+      "approved_by": "",
+      "letter_signed": false,
       "history": [
         {
           "code": "SMOKE",
           "points": 1,
-          "description": "Smoking near lab"
+          "description": "Smoking near lab",
+          "reporter": "",
+          "location": "",
+          "created_at": "2026-09-11T07:49:35+00:00"
         }
       ]
     },
@@ -20,16 +30,29 @@
       "course": "BSIT-1A",
       "total_demerits": 3,
       "status": "Suspended",
+      "parent_name": "",
+      "emergency_contact": "",
+      "meeting_date": "",
+      "counseling_note": "",
+      "dean_approved": false,
+      "approved_by": "",
+      "letter_signed": false,
       "history": [
         {
           "code": "CUTTING",
           "points": 2,
-          "description": "Skipped IT lab"
+          "description": "Skipped IT lab",
+          "reporter": "",
+          "location": "",
+          "created_at": "2026-09-11T07:49:35+00:00"
         },
         {
           "code": "SMOKE",
           "points": 1,
-          "description": "No ID worn"
+          "description": "No ID worn",
+          "reporter": "",
+          "location": "",
+          "created_at": "2026-09-11T07:49:35+00:00"
         }
       ]
     },
@@ -39,11 +62,21 @@
       "course": "BSIT-2B",
       "total_demerits": 3,
       "status": "Suspended",
+      "parent_name": "",
+      "emergency_contact": "",
+      "meeting_date": "",
+      "counseling_note": "",
+      "dean_approved": false,
+      "approved_by": "",
+      "letter_signed": false,
       "history": [
         {
           "code": "CHEAT",
           "points": 3,
-          "description": "Quiz cheating"
+          "description": "Quiz cheating",
+          "reporter": "",
+          "location": "",
+          "created_at": "2026-09-11T07:49:35+00:00"
         }
       ]
     },
@@ -53,11 +86,21 @@
       "course": "BSIT-2B",
       "total_demerits": 4,
       "status": "Lab Banned",
+      "parent_name": "",
+      "emergency_contact": "",
+      "meeting_date": "",
+      "counseling_note": "",
+      "dean_approved": false,
+      "approved_by": "",
+      "letter_signed": false,
       "history": [
         {
           "code": "PLAGIARISM",
           "points": 4,
-          "description": "Copied lab output"
+          "description": "Copied lab output",
+          "reporter": "",
+          "location": "",
+          "created_at": "2026-09-11T07:49:35+00:00"
         }
       ]
     },
@@ -66,17 +109,30 @@
       "name": "Eli Ramos",
       "course": "BSIT-3A",
       "total_demerits": 8,
-      "status": "Expelled",
+      "status": "Pending Disciplinary Review",
+      "parent_name": "",
+      "emergency_contact": "",
+      "meeting_date": "",
+      "counseling_note": "",
+      "dean_approved": false,
+      "approved_by": "",
+      "letter_signed": false,
       "history": [
         {
           "code": "HACK",
           "points": 5,
-          "description": "Portal probe attempt"
+          "description": "Portal probe attempt",
+          "reporter": "",
+          "location": "",
+          "created_at": "2026-09-11T07:49:35+00:00"
         },
         {
           "code": "CHEAT",
           "points": 3,
-          "description": "Cheating with Reuel Lambac"
+          "description": "Cheating with Reuel Lambac",
+          "reporter": "",
+          "location": "",
+          "created_at": "2026-09-11T07:49:35+00:00"
         }
       ]
     },
@@ -86,11 +142,21 @@
       "course": "BSIT-3A",
       "total_demerits": 1,
       "status": "Warned",
+      "parent_name": "",
+      "emergency_contact": "",
+      "meeting_date": "",
+      "counseling_note": "",
+      "dean_approved": false,
+      "approved_by": "",
+      "letter_signed": false,
       "history": [
         {
           "code": "NOID",
           "points": 1,
-          "description": "No ID worn"
+          "description": "No ID worn",
+          "reporter": "",
+          "location": "",
+          "created_at": "2026-09-11T07:49:35+00:00"
         }
       ]
     },
@@ -99,17 +165,30 @@
       "name": "Gus Lim",
       "course": "BSIT-1B",
       "total_demerits": 5,
-      "status": "Expelled",
+      "status": "Pending Disciplinary Review",
+      "parent_name": "",
+      "emergency_contact": "",
+      "meeting_date": "",
+      "counseling_note": "",
+      "dean_approved": false,
+      "approved_by": "",
+      "letter_signed": false,
       "history": [
         {
           "code": "CUTTING",
           "points": 2,
-          "description": "Cutting class"
+          "description": "Cutting class",
+          "reporter": "",
+          "location": "",
+          "created_at": "2026-09-11T07:49:35+00:00"
         },
         {
           "code": "CHEAT",
           "points": 3,
-          "description": "Quiz cheating"
+          "description": "Quiz cheating",
+          "reporter": "",
+          "location": "",
+          "created_at": "2026-09-11T07:49:35+00:00"
         }
       ]
     },
@@ -119,7 +198,38 @@
       "course": "BSIT-1B",
       "total_demerits": 0,
       "status": "Good Standing",
+      "parent_name": "",
+      "emergency_contact": "",
+      "meeting_date": "",
+      "counseling_note": "",
+      "dean_approved": false,
+      "approved_by": "",
+      "letter_signed": false,
       "history": []
+    },
+    {
+      "student_id": 63326,
+      "name": "John Doe",
+      "course": "BSIT-1A",
+      "total_demerits": 4,
+      "status": "Lab Banned",
+      "parent_name": "Jane Doe",
+      "emergency_contact": "+63-900-000-0000",
+      "meeting_date": "",
+      "counseling_note": "",
+      "dean_approved": false,
+      "approved_by": "",
+      "letter_signed": false,
+      "history": [
+        {
+          "code": "PLAGIARISM",
+          "points": 4,
+          "description": "Prior coding plagiarism",
+          "reporter": "System Seed",
+          "location": "IT Lab",
+          "created_at": "2026-09-11T07:49:35+00:00"
+        }
+      ]
     }
   ]
 }

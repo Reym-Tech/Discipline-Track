@@ -3,7 +3,9 @@
 ## Modules and Seams
 
 - **DisciplineLedger** is the deep Module. Interface: `register_student`,
-  `log_violation`, `get_student`, `audit_report`, `list_by_severity`,
+  `log_violation`, `get_student`, `audit_report(descending=False)`,
+  `list_by_severity(min, descending=False)`, `pending_cases`,
+  `approve_case`, `schedule_meeting`, `save_counseling_note`, `sign_letter`,
   `to_dict/from_dict`. Everything else is hidden Implementation.
 - **ConsequenceEngine** (`consequences.evaluate`) and **ViolationCatalog**
   (`catalog.lookup`) are pure Modules: return results, no side effects.
@@ -41,8 +43,22 @@ sync + balancing + consequences — it earns its keep.
 - At department scale (hundreds) both answer instantly; the split is a
   comparative study with a clean Seam, not a production bottleneck fix.
 
+## Workflow statuses (proposal decision: overwrite)
+
+`evaluate(total)` stays pure (`5+ → Expelled` recommendation). The record's
+`status` diverges to route human work: `log_violation` to 5+ sets
+`Pending Disciplinary Review`; `approve_case` (Dean `yes`) sets
+`Pending Disciplinary Meeting`. Legacy `Expelled` rows still count in
+`pending_cases()` so old JSON routes. Never filter the queue by
+`status == "Expelled"` — use `pending_cases()` (highest first).
+
+Audit ordering: stored ascending by `(demerits, ID)`; Dean/Guidance views
+request `descending=True` so the highest-risk flashes on top with
+`PROPOSAL: <STATUS> — <sanction>`.
+
 ## Error modes
 
 `DuplicateStudentError` (re-register), `StudentNotFoundError` (log for
 unknown ID), `UnknownViolationError` (bad code). All raised through the
-ledger Interface; CLI renders them as messages.
+ledger Interface; CLI renders them as messages. `approve_case` raises
+`ValueError` when the student is not expulsion-level.

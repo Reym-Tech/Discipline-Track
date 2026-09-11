@@ -44,10 +44,13 @@ def test_repeat_offender_escalates_to_expulsion():
     assert ledger.get_student(1002).status == "Warned"
     ledger.log_violation(1002, "CUTTING")  # total 3 -> Suspended
     assert ledger.get_student(1002).status == "Suspended"
-    ledger.log_violation(1002, "HACK")  # total 8 -> Expelled
+    consequence = ledger.log_violation(1002, "HACK")  # total 8 -> Expelled proposal
     rec = ledger.get_student(1002)
     assert rec.total_demerits == 8
-    assert rec.status == "Expelled"
+    # Proposal decision: overwrite status so case routes to Dean.
+    # Matrix recommendation stays Expelled; record status becomes pending.
+    assert consequence.status == "Expelled"
+    assert rec.status == "Pending Disciplinary Review"
 
 
 def test_audit_report_is_ordered_by_demerits_then_id():

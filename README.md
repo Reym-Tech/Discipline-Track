@@ -20,21 +20,32 @@ No Rich? The CLI falls back to plain `print` automatically.
 
 ## Use
 
-| Choice | Action |
+| Choice | Role / Action |
 |---|---|
-| 1 | Register student (ID, name, course) |
-| 2 | Log violation (code + description) |
-| 3 | Lookup student + history |
-| 4 | Full audit, ordered by (demerits, ID) |
-| 5 | High-risk filter (min demerits) |
-| 6 / 0 | Save (autosaves after every mutation) |
+| 1 | Guard Post: Log New Campus Violation (ID search via RB-Tree + guard name + code + description + location) |
+| 2 | Dean's Office: Run Discipline Audit (AVL descending, Critical Alert on top, `yes` to authorize) |
+| 3 | Guidance Office: Coordination queue (contacts, conference date, expulsion letter, counseling note) |
+| 4 | Register student (ID, name, course, parent + emergency contact) |
+| 5 | Lookup student + history |
+| 6 | High-risk filter (min demerits, highest first) |
+| 0 | Save + Exit (autosaves after every mutation) |
 
 Violation codes: `SMOKE` 1, `NOID` 1, `CUTTING` 2, `CHEAT` 3,
-`PLAGIARISM` 4, `HACK` 5.
+`PLAGIARISM` 4, `HACK` 5. Each entry also stores reporter, location, timestamp.
 
 Consequence matrix: 0 Good Standing · 1 Warned (Written Warning) ·
 2 Probation (Parent Conference) · 3 Suspended (3-Day Suspension + zero) ·
-4 Lab Banned (subject failure + lab ban) · 5+ Expelled.
+4 Lab Banned (subject failure + lab ban) · 5+ Expelled
+(`Immediate expulsion from the IT Department`).
+
+Workflow overwrite (approved proposal): the matrix recommendation stays
+pure, but the record `status` is overwritten to route the case —
+5+ demerits → `Pending Disciplinary Review` (Guard log),
+Dean `yes` → `Pending Disciplinary Meeting`. Filter routed queues via
+`pending_cases()`, not `status == "Expelled"`.
+
+Demo: seed includes `63326 John Doe` at 4 demerits (plagiarism). Log `NOID`
+as `Guard Ramos` to reproduce the 4→5 review flow.
 
 ## Layout
 
@@ -65,10 +76,15 @@ Two screens sharing the same JSON file as the terminal, so both stay in sync:
 * `/log` — Log violation: search-as-you-type by name or ID, violation picker
   from the catalog, instant consequence banner; inline registration form.
 
-JSON endpoints: `GET /api/audit?min_demerits=&limit=` (defaults: min 0,
-limit 10; min must be 0 or higher),
+JSON endpoints: `GET /api/audit?min_demerits=&limit=&order=` (defaults: min 0,
+limit 10, order asc; min must be 0 or higher; order asc|desc),
 `GET /api/students?q=`, `GET /api/students/<id>`,
-`POST /api/students`, `POST /api/violations`.
+`POST /api/students` (accepts parent_name, emergency_contact),
+`POST /api/violations` (accepts reporter, location),
+`GET /api/cases` (Dean→Guidance queue, highest first),
+`POST /api/cases/<id>/approve` (requires `{"confirm":"yes"}`),
+`POST /api/cases/<id>/meeting`, `POST /api/cases/<id>/counseling`,
+`GET /api/cases/<id>/letter`.
 Errors map 1:1 from the ledger (400 bad code/payload, 404 unknown student,
 409 duplicate).
 

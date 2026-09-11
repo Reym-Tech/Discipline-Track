@@ -24,15 +24,31 @@ AUDIT_LIMIT_CAP = 5000
 
 
 def record_to_json(rec: StudentRecord) -> dict:
+    consequence = evaluate(rec.total_demerits)
     return {
         "student_id": rec.student_id,
         "name": rec.name,
         "course": rec.course,
         "total_demerits": rec.total_demerits,
         "status": rec.status,
-        "sanction": evaluate(rec.total_demerits).sanction,
+        "sanction": consequence.sanction,
+        "proposal": f"{consequence.status.upper()} — {consequence.sanction}",
+        "parent_name": getattr(rec, "parent_name", ""),
+        "emergency_contact": getattr(rec, "emergency_contact", ""),
+        "meeting_date": getattr(rec, "meeting_date", ""),
+        "counseling_note": getattr(rec, "counseling_note", ""),
+        "dean_approved": getattr(rec, "dean_approved", False),
+        "approved_by": getattr(rec, "approved_by", ""),
+        "letter_signed": getattr(rec, "letter_signed", False),
         "history": [
-            {"code": h.code, "points": h.points, "description": h.description}
+            {
+                "code": h.code,
+                "points": h.points,
+                "description": h.description,
+                "reporter": getattr(h, "reporter", ""),
+                "location": getattr(h, "location", ""),
+                "created_at": getattr(h, "created_at", ""),
+            }
             for h in rec.history
         ],
     }
@@ -57,14 +73,16 @@ def create_app(data_path: str = DEFAULT_PATH) -> Flask:
     # -- pages ---------------------------------------------------------
     @app.get("/")
     def audit_page():
-        rows = ledger().audit_report()[:SERVER_RENDER_CAP]
+        rows = ledger().audit_report(descending=True)[:SERVER_RENDER_CAP]
         total = len(ledger())
+        critical = rows[0] if rows and rows[0].total_demerits >= 5 else None
         return render_template(
             "audit.html",
             rows=rows,
             total=total,
             rendered=len(rows),
             at_risk=len(ledger().list_by_severity(3)),
+            critical=critical,
         )
 
     @app.get("/log")
@@ -81,12 +99,16 @@ def create_app(data_path: str = DEFAULT_PATH) -> Flask:
             return jsonify(error="min_demerits and limit must be integers"), 400
         if min_demerits < 0:
             return jsonify(error="min_demerits must be 0 or higher"), 400
+        order = (request.args.get("order") or "asc").strip().lower()
+        if order not in ("asc", "desc"):
+            return jsonify(error="order must be 'asc' or 'desc'"), 400
         limit = max(1, min(limit, AUDIT_LIMIT_CAP))
-        matching = ledger().list_by_severity(min_demerits)
+        matching = ledger().list_by_severity(min_demerits, descending=(order == "desc"))
         return jsonify(
             students=[record_to_json(r) for r in matching[:limit]],
             total=len(matching),
             returned=min(len(matching), limit),
+            order=order,
         )
 
     @app.get("/api/students")
@@ -122,9 +144,14 @@ def create_app(data_path: str = DEFAULT_PATH) -> Flask:
         if not name:
             return jsonify(error="name is required"), 400
         course = str(data.get("course") or "").strip()
+        parent_name = str(data.get("parent_name") or "").strip()
+        emergency_contact = str(data.get("emergency_contact") or "").strip()
         try:
             with app.config["LOCK"]:
-                rec = ledger().register_student(sid, name, course)
+                rec = ledger().register_student(
+                    sid, name, course,
+                    parent_name=parent_name, emergency_contact=emergency_contact,
+                )
                 persist()
         except DuplicateStudentError as exc:
             return jsonify(error=str(exc)), 409
@@ -141,9 +168,13 @@ def create_app(data_path: str = DEFAULT_PATH) -> Flask:
         if not code:
             return jsonify(error="code is required"), 400
         description = str(data.get("description") or "").strip()
+        reporter = str(data.get("reporter") or "").strip()
+        location = str(data.get("location") or "").strip()
         try:
             with app.config["LOCK"]:
-                consequence = ledger().log_violation(sid, code, description)
+                consequence = ledger().log_violation(
+                    sid, code, description, reporter=reporter, location=location
+                )
                 rec = ledger().get_student(sid)
                 assert rec is not None
                 persist()
@@ -155,6 +186,66 @@ def create_app(data_path: str = DEFAULT_PATH) -> Flask:
             record=record_to_json(rec),
             consequence={"status": consequence.status, "sanction": consequence.sanction},
         )
+
+    # -- Guidance case queue (Phases 2-4) ------------------------------
+    @app.get("/api/cases")
+    def api_cases():
+        return jsonify(
+            cases=[record_to_json(r) for r in ledger().pending_cases()],
+            total=len(ledger().pending_cases()),
+        )
+
+    @app.post("/api/cases/<int:student_id>/approve")
+    def api_approve(student_id: int):
+        data = request.get_json(silent=True) or {}
+        approved_by = str(data.get("approved_by") or "Dean")
+        confirm = str(data.get("confirm") or "").strip().lower()
+        # Web requires explicit confirm=yes to mirror terminal "yes" gate.
+        if confirm not in ("yes", "y"):
+            return jsonify(error="confirm must be 'yes' to authorize"), 400
+        try:
+            with app.config["LOCK"]:
+                rec = ledger().approve_case(student_id, approved_by=approved_by)
+                persist()
+        except StudentNotFoundError as exc:
+            return jsonify(error=str(exc)), 404
+        except ValueError as exc:
+            return jsonify(error=str(exc)), 400
+        return jsonify(record_to_json(rec))
+
+    @app.post("/api/cases/<int:student_id>/meeting")
+    def api_meeting(student_id: int):
+        data = request.get_json(silent=True) or {}
+        try:
+            with app.config["LOCK"]:
+                rec = ledger().schedule_meeting(
+                    student_id,
+                    str(data.get("meeting_date") or ""),
+                    parent_name=str(data.get("parent_name") or ""),
+                    emergency_contact=str(data.get("emergency_contact") or ""),
+                )
+                persist()
+        except StudentNotFoundError as exc:
+            return jsonify(error=str(exc)), 404
+        return jsonify(record_to_json(rec))
+
+    @app.post("/api/cases/<int:student_id>/counseling")
+    def api_counseling(student_id: int):
+        data = request.get_json(silent=True) or {}
+        try:
+            with app.config["LOCK"]:
+                rec = ledger().save_counseling_note(student_id, str(data.get("note") or ""))
+                persist()
+        except StudentNotFoundError as exc:
+            return jsonify(error=str(exc)), 404
+        return jsonify(record_to_json(rec))
+
+    @app.get("/api/cases/<int:student_id>/letter")
+    def api_letter(student_id: int):
+        rec = ledger().get_student(student_id)
+        if rec is None:
+            return jsonify(error=f"Student {student_id} not found"), 404
+        return jsonify(letter=rec.expulsion_letter(), record=record_to_json(rec))
 
     return app
 

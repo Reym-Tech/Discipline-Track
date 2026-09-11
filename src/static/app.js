@@ -43,7 +43,7 @@
       var limit = "10";
       show(document.getElementById("filter-error"), "");
       auditBody.innerHTML = '<tr><td colspan="6" class="empty">Loading filtered records…</td></tr>';
-      fetch("/api/audit?min_demerits=" + encodeURIComponent(min) + "&limit=" + encodeURIComponent(limit))
+      fetch("/api/audit?min_demerits=" + encodeURIComponent(min) + "&limit=" + encodeURIComponent(limit) + "&order=desc")
         .then(function (res) {
           if (!res.ok) throw new Error("Filter request failed (" + res.status + "). Check the numbers and retry.");
           return res.json();
@@ -164,11 +164,15 @@
       if (!chosen) return;
       var code = document.getElementById("code").value;
       var desc = document.getElementById("desc").value.trim();
+      var reporterEl = document.getElementById("reporter");
+      var locationEl = document.getElementById("location");
+      var reporter = reporterEl ? reporterEl.value.trim() : "";
+      var location = locationEl ? locationEl.value.trim() : "";
       show(document.getElementById("log-error"), "");
       fetch("/api/violations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ student_id: chosen.student_id, code: code, description: desc })
+        body: JSON.stringify({ student_id: chosen.student_id, code: code, description: desc, reporter: reporter, location: location })
       })
         .then(function (res) {
           return res.json().then(function (body) {
