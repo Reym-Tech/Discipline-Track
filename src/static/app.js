@@ -18,6 +18,54 @@
     });
   }
 
+  /* ---- Display preferences: text size + high contrast, persisted ---- */
+  (function prefs() {
+    var root = document.documentElement;
+    var group = document.getElementById("text-size");
+    var toggle = document.getElementById("contrast-toggle");
+    if (!group && !toggle) return;
+
+    function store(key, value) {
+      try {
+        if (value === null) localStorage.removeItem(key);
+        else localStorage.setItem(key, value);
+      } catch (e) {}
+    }
+
+    function applyText(size) {
+      if (size === "large" || size === "xl") root.setAttribute("data-text", size);
+      else root.removeAttribute("data-text");
+      store("dt-text", size === "default" ? null : size);
+      if (group) {
+        group.querySelectorAll("button[data-size]").forEach(function (btn) {
+          btn.setAttribute("aria-pressed", btn.getAttribute("data-size") === size ? "true" : "false");
+        });
+      }
+    }
+
+    function applyContrast(high) {
+      if (high) root.setAttribute("data-contrast", "high");
+      else root.removeAttribute("data-contrast");
+      store("dt-contrast", high ? "1" : null);
+      if (toggle) toggle.setAttribute("aria-pressed", high ? "true" : "false");
+    }
+
+    if (group) {
+      group.addEventListener("click", function (ev) {
+        var btn = ev.target.closest("button[data-size]");
+        if (btn) applyText(btn.getAttribute("data-size"));
+      });
+      var current = root.getAttribute("data-text") || "default";
+      applyText(current);
+    }
+    if (toggle) {
+      if (root.getAttribute("data-contrast") === "high") toggle.setAttribute("aria-pressed", "true");
+      toggle.addEventListener("click", function () {
+        applyContrast(root.getAttribute("data-contrast") !== "high");
+      });
+    }
+  })();
+
   /* ---- Audit screen ---- */
   var filterForm = document.getElementById("filter-form");
   if (filterForm) {

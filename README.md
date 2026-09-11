@@ -70,6 +70,13 @@ JSON endpoints: `GET /api/audit?min_demerits=&limit=`,
 Errors map 1:1 from the ledger (400 bad code/payload, 404 unknown student,
 409 duplicate).
 
+Design: Neumorphism club world (`.agents/frontend` tokens — teal `#006666`
+on warm-gray `#E7E5E4`, self-hosted Space Mono / JetBrains Mono, tactile
+extruded surfaces). Elderly and low-vision support: 18px base with A / A+ /
+A++ text-size control, high-contrast toggle, 44px+ targets, skip link,
+visible focus rings, keyboard-first controls — all persisted locally.
+Every text/background pair is AA-verified via `scripts/check_contrast.py`.
+
 ## Measured behaviour (N=1000/5000, this machine)
 
 RB insert ≈ 3–4× faster than AVL insert (fewer rotations).

@@ -29,6 +29,22 @@ def test_pages_render(client):
     assert b"PLAGIARISM" in res.data
 
 
+def test_pages_include_accessibility_controls(client):
+    for path in ("/", "/log"):
+        html = client.get(path).data
+        assert b'id="skip-link"' in html
+        assert b'id="text-size"' in html
+        assert b'id="contrast-toggle"' in html
+        assert b"<main" in html
+
+
+def test_self_hosted_fonts_served(client):
+    for name in ("SpaceMono-Regular", "SpaceMono-Bold", "JetBrainsMono-Regular"):
+        res = client.get(f"/static/fonts/{name}.woff2")
+        assert res.status_code == 200
+        assert res.data[:4] == b"wOF2"
+
+
 def test_register_then_duplicate_maps_to_409(client):
     assert _register(client).status_code == 201
     assert _register(client).status_code == 409

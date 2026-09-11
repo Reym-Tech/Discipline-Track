@@ -4,19 +4,37 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Discipline-Track{% endblock %}</title>
+  <script>
+  (function () {
+    try {
+      var t = localStorage.getItem("dt-text");
+      if (t === "large" || t === "xl") document.documentElement.setAttribute("data-text", t);
+      if (localStorage.getItem("dt-contrast") === "1") document.documentElement.setAttribute("data-contrast", "high");
+    } catch (e) {}
+  })();
+  </script>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+  <a id="skip-link" href="#main">Skip to main content</a>
   <header class="topbar">
     <div class="wrap topbar-inner">
       <span class="brand">Discipline-Track</span>
       <nav aria-label="Primary">
-        <a href="{{ url_for('audit_page') }}" class="{% if request.path == '/' %}current{% endif %}">Audit</a>
-        <a href="{{ url_for('log_page') }}" class="{% if request.path == '/log' %}current{% endif %}">Log violation</a>
+        <a href="{{ url_for('audit_page') }}" class="{% if request.path == '/' %}current{% endif %}" {% if request.path == '/' %}aria-current="page"{% endif %}>Audit</a>
+        <a href="{{ url_for('log_page') }}" class="{% if request.path == '/log' %}current{% endif %}" {% if request.path == '/log' %}aria-current="page"{% endif %}>Log violation</a>
       </nav>
+      <div class="display-controls">
+        <div id="text-size" role="group" aria-label="Text size">
+          <button type="button" data-size="default" aria-pressed="true" title="Standard text size">A</button>
+          <button type="button" data-size="large" aria-pressed="false" title="Larger text">A+</button>
+          <button type="button" data-size="xl" aria-pressed="false" title="Largest text">A++</button>
+        </div>
+        <button type="button" id="contrast-toggle" aria-pressed="false">High contrast</button>
+      </div>
     </div>
   </header>
-  <main class="wrap">
+  <main id="main" class="wrap" tabindex="-1">
     {% block content %}{% endblock %}
   </main>
   <footer class="wrap footer">
