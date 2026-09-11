@@ -45,6 +45,16 @@ def test_self_hosted_fonts_served(client):
         assert res.data[:4] == b"wOF2"
 
 
+def test_tour_assets_and_trigger(client):
+    for path in ("/", "/log"):
+        html = client.get(path).data
+        assert b'id="tour-start"' in html
+        assert b"tour.js" in html
+    res = client.get("/static/tour.js")
+    assert res.status_code == 200
+    assert b"dt-tour-seen" in res.data
+
+
 def test_register_then_duplicate_maps_to_409(client):
     assert _register(client).status_code == 201
     assert _register(client).status_code == 409

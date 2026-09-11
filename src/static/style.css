@@ -115,7 +115,7 @@ nav a.current { background: var(--primary-tint); color: var(--primary); box-shad
 #text-size button:first-child { border-radius: var(--radius) 0 0 var(--radius); }
 #text-size button:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
 #text-size button[aria-pressed="true"] { background: var(--primary-tint); color: var(--primary); box-shadow: var(--shadow-in); }
-#contrast-toggle {
+#contrast-toggle, #tour-start {
   font-family: var(--font-label); font-weight: 700; font-size: 0.8rem;
   background: var(--surface); color: var(--text);
   border: 1px solid var(--line); border-radius: var(--radius);
@@ -192,6 +192,7 @@ tbody tr:hover { background: var(--well); }
 .field input:focus-visible, .field select:focus-visible,
 .btn:focus-visible, nav a:focus-visible, .results button:focus-visible,
 #text-size button:focus-visible, #contrast-toggle:focus-visible,
+#tour-start:focus-visible, .tour-tip button:focus-visible,
 #skip-link:focus-visible {
   outline: 3px solid var(--primary); outline-offset: 3px;
 }
@@ -287,6 +288,7 @@ html[data-contrast="high"] .chips li {
 html[data-contrast="high"] .btn,
 html[data-contrast="high"] .results button,
 html[data-contrast="high"] #contrast-toggle,
+html[data-contrast="high"] #tour-start,
 html[data-contrast="high"] #text-size {
   border: 2px solid #000000;
 }
@@ -311,6 +313,33 @@ html[data-contrast="high"] .topbar { box-shadow: none; border-bottom: 2px solid 
   main.wrap { padding: 1.1rem; border-radius: 0; box-shadow: none; margin-top: 0; }
   .topbar-inner { min-height: 64px; }
 }
+
+/* Guided tour: spotlight cutout dims the page; tooltip carries the lesson.
+   Layers never intercept clicks, so users can keep exploring mid-tour. */
+.tour-spot {
+  position: fixed; z-index: 201; pointer-events: none;
+  border: 3px solid var(--primary); border-radius: 12px;
+  box-shadow: 0 0 0 9999px rgba(20, 26, 34, 0.55);
+  transition: left 200ms ease-out, top 200ms ease-out, width 200ms ease-out, height 200ms ease-out;
+}
+.tour-tip {
+  position: fixed; z-index: 202;
+  background: var(--surface); color: var(--text);
+  border-radius: 12px; box-shadow: var(--shadow-out);
+  padding: 1.1rem 1.2rem;
+}
+.tour-tip h2 { font-size: 1.2rem; letter-spacing: -0.01em; margin: 0.15rem 0 0.45rem; }
+.tour-tip h2:focus { outline: none; }
+.tour-tip h2:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+.tour-tip > p { margin: 0 0 0.9rem; max-width: 60ch; }
+.tour-progress {
+  font-family: var(--font-label); font-size: 0.8rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 0;
+}
+.tour-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+html[data-contrast="high"] .tour-spot { border-color: #000000; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.65); }
+html[data-contrast="high"] .tour-tip { border: 2px solid #000000; box-shadow: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

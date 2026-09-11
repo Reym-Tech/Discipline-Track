@@ -25,6 +25,7 @@
         <a href="{{ url_for('log_page') }}" class="{% if request.path == '/log' %}current{% endif %}" {% if request.path == '/log' %}aria-current="page"{% endif %}>Log violation</a>
       </nav>
       <div class="display-controls">
+        <button type="button" id="tour-start" title="Take a guided tour of this screen">Tour</button>
         <div id="text-size" role="group" aria-label="Text size">
           <button type="button" data-size="default" aria-pressed="true" title="Standard text size">A</button>
           <button type="button" data-size="large" aria-pressed="false" title="Larger text">A+</button>
@@ -40,6 +41,7 @@
   <footer class="wrap footer">
     <p>Records persist to the shared JSON file, so the terminal and web views stay in sync.</p>
   </footer>
+  <script src="{{ url_for('static', filename='tour.js') }}" defer></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

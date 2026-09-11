@@ -77,6 +77,11 @@ A++ text-size control, high-contrast toggle, 44px+ targets, skip link,
 visible focus rings, keyboard-first controls — all persisted locally.
 Every text/background pair is AA-verified via `scripts/check_contrast.py`.
 
+First visit to either screen auto-starts a short guided tour (spotlight +
+plain-language steps, Skippable, replayable via the header Tour button,
+remembered per browser). The log tour drives a real demo search; the tour
+never creates or edits records.
+
 ## Measured behaviour (N=1000/5000, this machine)
 
 RB insert ≈ 3–4× faster than AVL insert (fewer rotations).
