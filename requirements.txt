@@ -1,3 +1,4 @@
 pytest>=8
 rich>=13
 flask>=3
+gunicorn>=21
