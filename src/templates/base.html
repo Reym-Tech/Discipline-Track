@@ -4,15 +4,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Discipline-Track{% endblock %}</title>
-  <script>
-  (function () {
-    try {
-      var t = localStorage.getItem("dt-text");
-      if (t === "large" || t === "xl") document.documentElement.setAttribute("data-text", t);
-      if (localStorage.getItem("dt-contrast") === "1") document.documentElement.setAttribute("data-contrast", "high");
-    } catch (e) {}
-  })();
-  </script>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -26,12 +17,6 @@
       </nav>
       <div class="display-controls">
         <button type="button" id="tour-start" title="Take a guided tour of this screen">Tour</button>
-        <div id="text-size" role="group" aria-label="Text size">
-          <button type="button" data-size="default" aria-pressed="true" title="Standard text size">A</button>
-          <button type="button" data-size="large" aria-pressed="false" title="Larger text">A+</button>
-          <button type="button" data-size="xl" aria-pressed="false" title="Largest text">A++</button>
-        </div>
-        <button type="button" id="contrast-toggle" aria-pressed="false">High contrast</button>
       </div>
     </div>
   </header>

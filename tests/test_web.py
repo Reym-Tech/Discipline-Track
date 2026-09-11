@@ -29,13 +29,15 @@ def test_pages_render(client):
     assert b"PLAGIARISM" in res.data
 
 
-def test_pages_include_accessibility_controls(client):
+def test_pages_include_accessibility_landmarks(client):
     for path in ("/", "/log"):
         html = client.get(path).data
         assert b'id="skip-link"' in html
-        assert b'id="text-size"' in html
-        assert b'id="contrast-toggle"' in html
         assert b"<main" in html
+        assert b'id="tour-start"' in html
+        # Display controls were removed; header keeps nav + tour only.
+        assert b'id="text-size"' not in html
+        assert b'id="contrast-toggle"' not in html
 
 
 def test_self_hosted_fonts_served(client):

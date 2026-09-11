@@ -12,30 +12,20 @@
 
   var STEPS = {
     "/": [
-      { sel: ".chips", title: "Counts at a glance",
-        body: "Total students, and how many sit at 3 or more demerits. Start here each morning to see whether anything needs attention." },
-      { sel: "#filter-form", title: "Filter to the students who matter",
-        body: "Set a minimum \u2014 3 shows suspension-level cases and up \u2014 then Apply filter. The table refreshes without reloading the page." },
-      { sel: "#audit-table", title: "Ordered by severity",
-        body: "Everyone is sorted by demerits, then by ID, so the highest totals sit at the bottom. Next, the tour opens one record." },
+      { sel: "#audit-table", title: "Severity, sorted",
+        body: "Everyone ordered by demerits, then ID \u2014 the highest totals sit at the bottom." },
       { sel: ".view-btn", title: "Open a full record", demo: "firstView",
-        body: "The tour just opened the first record. In real use, press View on any row to see what the committee sees." },
-      { sel: "#detail", title: "History and sanction in one place",
-        body: "Every offense with its points, plus the sanction the matrix applied. Nothing to memorize, nothing to look up." },
-      { sel: ".display-controls", title: "Make it yours",
-        body: "Bigger text and high contrast stay saved on this computer. Replay this tour anytime with the Tour button." }
+        body: "The tour opened the first record: history plus the applied sanction." },
+      { sel: "#filter-form", title: "Catch the urgent cases", goto: "/log",
+        body: "Set a minimum \u2014 3 means suspension-level and up \u2014 then Apply. Continue for the logging screen." }
     ],
     "/log": [
-      { sel: "#q", title: "Find the student first",
-        body: "Type a name or ID \u2014 matches appear as you type. The tour runs a search next so you can watch it work." },
-      { sel: "#results", title: "Pick the right person", demo: "search",
-        body: "The tour picked the first match. In real use, check the demerits beside each name before choosing." },
-      { sel: "#violation-form", title: "Record the offense",
-        body: "Choose the violation \u2014 points come from the catalog automatically. Logging applies the consequence instantly, shows it in a banner below, and saves." },
-      { sel: "#register-form", title: "Someone new?",
-        body: "If the ID is not on file, register here first, then search above to log the offense." },
-      { sel: null, title: "You know the loop",
-        body: "Find, record, review. The audit screen shows these same records, always in severity order." }
+      { sel: "#q", title: "Find the student",
+        body: "Type a name or ID; matches appear as you type. The tour runs one next." },
+      { sel: "#results", title: "Pick the person", demo: "search",
+        body: "The tour picked the first match. In real use, check the demerits beside each name." },
+      { sel: "#violation-form", title: "Record it",
+        body: "Pick the violation \u2014 points and the consequence apply instantly and save." }
     ]
   };
 
@@ -147,7 +137,16 @@
     tip.setAttribute("aria-labelledby", "tour-title");
     tip.setAttribute("aria-describedby", "tour-body");
     backBtn.addEventListener("click", function () { go(idx - 1); });
-    nextBtn.addEventListener("click", function () { go(idx + 1); });
+    nextBtn.addEventListener("click", function () {
+      var step = steps[idx];
+      if (step && step.goto) {
+        try { sessionStorage.setItem("dt-tour-next", "1"); } catch (e) {}
+        store(SEEN_KEY, "1");
+        window.location.href = step.goto;
+        return;
+      }
+      go(idx + 1);
+    });
     skipBtn.addEventListener("click", end);
     document.addEventListener("keydown", function (ev) {
       if (!running) return;
@@ -231,7 +230,8 @@
     tipBody.textContent = step.body;
     tipCount.textContent = "Step " + (idx + 1) + " of " + total;
     backBtn.disabled = idx === 0;
-    nextBtn.textContent = idx === total - 1 ? "Finish" : "Next";
+    if (step.goto) nextBtn.textContent = "Next: Log violation";
+    else nextBtn.textContent = idx === total - 1 ? "Finish" : "Next";
     tip.hidden = false;
     tipTitle.focus({ preventScroll: true });
   }
@@ -314,11 +314,16 @@
     var trigger = document.getElementById("tour-start");
     if (trigger) trigger.addEventListener("click", start);
     if (!trigger) return;
-    if (read(SEEN_KEY)) return;
+    var continued = false;
+    try {
+      continued = sessionStorage.getItem("dt-tour-next") === "1";
+      sessionStorage.removeItem("dt-tour-next");
+    } catch (e) {}
+    if (!continued && read(SEEN_KEY)) return;
     var list = stepsFor(window.location.pathname);
     if (!list.length) return;
     setTimeout(function () {
-      if (read(SEEN_KEY)) return;
+      if (!continued && read(SEEN_KEY)) return;
       start();
     }, 800);
   }

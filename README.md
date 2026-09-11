@@ -70,17 +70,16 @@ JSON endpoints: `GET /api/audit?min_demerits=&limit=`,
 Errors map 1:1 from the ledger (400 bad code/payload, 404 unknown student,
 409 duplicate).
 
-Design: Neumorphism club world (`.agents/frontend` tokens — teal `#006666`
-on warm-gray `#E7E5E4`, self-hosted Space Mono / JetBrains Mono, tactile
-extruded surfaces). Elderly and low-vision support: 18px base with A / A+ /
-A++ text-size control, high-contrast toggle, 44px+ targets, skip link,
-visible focus rings, keyboard-first controls — all persisted locally.
-Every text/background pair is AA-verified via `scripts/check_contrast.py`.
+Design: Neumorphism club tokens (teal `#006666` on warm-gray `#E7E5E4`,
+self-hosted Space Mono / JetBrains Mono), flat white cards with 1px borders.
+Readable by default: 18px base, 44px+ targets, skip link, visible focus
+rings. Every text/background pair is AA-verified via
+`scripts/check_contrast.py`.
 
-First visit to either screen auto-starts a short guided tour (spotlight +
-plain-language steps, Skippable, replayable via the header Tour button,
-remembered per browser). The log tour drives a real demo search; the tour
-never creates or edits records.
+First visit auto-starts a brief guided tour (3 steps per screen, spotlight +
+one-line descriptions, skippable, replayable via the header Tour button,
+remembered per browser). The audit tour hands off to the Log tour, which
+drives a real demo search; the tour never creates or edits records.
 
 ## Measured behaviour (N=1000/5000, this machine)
 
