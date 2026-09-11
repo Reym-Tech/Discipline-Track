@@ -70,10 +70,10 @@ JSON endpoints: `GET /api/audit?min_demerits=&limit=`,
 Errors map 1:1 from the ledger (400 bad code/payload, 404 unknown student,
 409 duplicate).
 
-Design: Neumorphism club tokens (teal `#006666` on warm-gray `#E7E5E4`,
-self-hosted Space Mono / JetBrains Mono), flat white cards with 1px borders;
-the club's soft shadows appear only on the tour tooltip (modal) and on
-highlights (spotlight ring, selected search result).
+Design: full Neumorphism club world (teal `#006666` on warm-gray `#E7E5E4`,
+self-hosted Space Mono / JetBrains Mono) — extruded surfaces, pressed inputs,
+no flat base. The tour tooltip floats in the same soft shadow as the
+spotlight highlight, with no stroke.
 Readable by default: 18px base, 44px+ targets, skip link, visible focus
 rings. Every text/background pair is AA-verified via
 `scripts/check_contrast.py`.

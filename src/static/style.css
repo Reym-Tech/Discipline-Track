@@ -1,9 +1,10 @@
-/* Discipline-Track web: Neumorphism-club world (.agents/frontend), restrained.
+/* Discipline-Track web: full Neumorphism-club world (.agents/frontend), no flat base.
    Tokens: primary #006666, secondary #F1F2F5, surface #E7E5E4, text #1E2938.
-   Elevation is flat 1px borders everywhere EXCEPT the modal (tour tooltip)
-   and highlights (tour spotlight ring, selected search result), which carry
-   the club's soft extruded/pressed shadows. Border and shadow never stack.
-   Every text/background pair verified >= 4.5:1 (see scripts/check_contrast.py).
+   Surfaces extrude from the canvas (outset shadows), inputs and pressed states
+   sit into it (inset shadows). Border and shadow never stack on one element.
+   The tour tooltip (modal) floats in the same soft shadow language as the
+   spotlight highlight, with no stroke. Text/background pairs >= 4.5:1
+   (see scripts/check_contrast.py).
    Type: Space Mono (display/body), JetBrains Mono (labels/data captions). */
 @font-face {
   font-family: "Space Mono";
@@ -38,11 +39,10 @@
   --surface: #E7E5E4;
   --surface-hi: #FFFFFF;
   --surface-lo: #C6C2BE;
-  --card: #FFFFFF;
   --well: #F1F2F5;
   --text: #1E2938;
   --muted: #3F4753;
-  --line: #C9C5C0;
+  --line: #CFCCC8;
   --primary: #006666;
   --primary-deep: #004D4D;
   --primary-ink: #FFFFFF;
@@ -50,13 +50,18 @@
   --danger-deep: #8F1030;
   --expel-deep: #6E0B24;
   --error: #A3133C;
-  --shadow-out: 6px 6px 12px var(--surface-lo), -6px -6px 12px var(--surface-hi);
-  --shadow-out-sm: 3px 3px 7px var(--surface-lo), -3px -3px 7px var(--surface-hi);
-  --shadow-in: inset 3px 3px 6px var(--surface-lo), inset -3px -3px 6px var(--surface-hi);
   --font: "Space Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
   --font-label: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
   --radius: 8px;
   --measure: 70ch;
+  --shadow-out: 6px 6px 12px var(--surface-lo), -6px -6px 12px var(--surface-hi);
+  --shadow-out-sm: 3px 3px 7px var(--surface-lo), -3px -3px 7px var(--surface-hi);
+  --shadow-in: inset 3px 3px 6px var(--surface-lo), inset -3px -3px 6px var(--surface-hi);
+  --shadow-btn: 4px 4px 10px #B4B0AB;
+  /* Modal + highlight lift: soft offset diffusion, shared by the tour
+     spotlight ring and the tour tooltip. No stroke on either. */
+  --shadow-lift: 12px 12px 40px rgba(20, 26, 34, 0.35);
+  --shadow-lift-sm: 8px 8px 24px rgba(20, 26, 34, 0.45);
 }
 
 * { box-sizing: border-box; }
@@ -87,8 +92,8 @@ body {
 #skip-link:focus-visible { top: 0.6rem; }
 
 .topbar {
-  background: var(--card);
-  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: 0 4px 10px var(--surface-lo);
   position: sticky; top: 0; z-index: 50;
 }
 .topbar-inner {
@@ -101,24 +106,26 @@ nav a {
   color: var(--text); text-decoration: none; font-weight: 700;
   display: inline-flex; align-items: center; min-height: 44px;
   padding: 0.45rem 0.9rem; border-radius: var(--radius);
-  border: 1px solid transparent;
 }
-nav a:hover { background: var(--well); border-color: var(--line); }
-nav a.current { background: var(--primary-tint); color: var(--primary); border-color: var(--primary); }
+nav a:hover { box-shadow: var(--shadow-out-sm); }
+nav a.current { background: var(--primary-tint); color: var(--primary); box-shadow: var(--shadow-in); }
 
 .display-controls { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; }
 #tour-start {
   font-family: var(--font-label); font-weight: 700; font-size: 0.8rem;
-  background: var(--card); color: var(--text);
-  border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--surface); color: var(--text);
+  border: 0; border-radius: var(--radius);
+  box-shadow: var(--shadow-out-sm);
   min-height: 44px; padding: 0 0.8rem; cursor: pointer;
+  transition: box-shadow 180ms ease-out;
 }
-#tour-start:hover { background: var(--well); }
+#tour-start:hover { box-shadow: var(--shadow-out); }
+#tour-start:active { box-shadow: var(--shadow-in); }
 
 main.wrap {
-  background: var(--card);
-  border: 1px solid var(--line);
+  background: var(--surface);
   border-radius: 16px;
+  box-shadow: var(--shadow-out);
   margin-top: 1.5rem; margin-bottom: 1.5rem;
   padding: 1.75rem;
 }
@@ -133,14 +140,14 @@ h3 { font-size: 1rem; margin: 1.1rem 0 0.5rem; }
 
 .chips { list-style: none; display: flex; gap: 0.7rem; flex-wrap: wrap; padding: 0; margin: 0 0 1.5rem; }
 .chips li {
-  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 0.5rem 0.9rem;
+  background: var(--surface); border-radius: var(--radius);
+  box-shadow: var(--shadow-out-sm); padding: 0.5rem 0.9rem;
 }
 
 .split { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
 
 section[aria-label="Audit table"], .table-card {
-  background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+  background: var(--surface); border-radius: 12px; box-shadow: var(--shadow-out);
   padding: 1rem; overflow-x: auto;
 }
 table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
@@ -148,7 +155,7 @@ thead th {
   text-align: left; font-family: var(--font-label); font-size: 0.8125rem;
   text-transform: uppercase; letter-spacing: 0.06em;
   color: var(--muted); border-bottom: 2px solid var(--line); padding: 0.6rem 0.5rem;
-  position: sticky; top: 0; background: var(--card); white-space: nowrap;
+  position: sticky; top: 0; background: var(--surface); white-space: nowrap;
 }
 tbody td { border-bottom: 1px solid var(--line); padding: 0.6rem 0.5rem; vertical-align: middle; }
 tbody tr:last-child td { border-bottom: 0; }
@@ -180,8 +187,8 @@ tbody tr:hover { background: var(--well); }
 .field label { font-weight: 700; font-size: 0.95rem; }
 .field input, .field select {
   font-family: var(--font); font-size: 1rem; color: var(--text);
-  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 0.6rem 0.8rem;
+  background: var(--surface); border: 0; border-radius: var(--radius);
+  box-shadow: var(--shadow-in); padding: 0.6rem 0.8rem;
   min-height: 48px; max-width: 24rem;
   caret-color: var(--primary);
 }
@@ -195,22 +202,26 @@ tbody tr:hover { background: var(--well); }
 
 .btn {
   font-family: var(--font); font-weight: 700; font-size: 0.95rem; color: var(--text);
-  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--surface); border: 0; border-radius: var(--radius);
+  box-shadow: var(--shadow-out-sm);
   min-height: 48px; padding: 0.6rem 1.2rem; cursor: pointer;
-  transition: background-color 150ms ease-out, transform 120ms ease-out;
+  transition: box-shadow 180ms ease-out;
   white-space: nowrap;
 }
-.btn:hover { background: var(--well); }
-.btn:active { transform: translateY(1px); }
-.btn-primary { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
-.btn-primary:hover { background: var(--primary-deep); }
-.btn-primary:active { background: var(--primary-deep); }
+.btn:hover { box-shadow: var(--shadow-out); }
+.btn:active { box-shadow: var(--shadow-in); }
+.btn-primary {
+  background: var(--primary); color: var(--primary-ink);
+  box-shadow: var(--shadow-btn);
+}
+.btn-primary:hover { background: var(--primary-deep); box-shadow: var(--shadow-btn); }
+.btn-primary:active { background: var(--primary-deep); box-shadow: var(--shadow-in); }
 .btn-small { min-height: 44px; padding: 0.4rem 0.9rem; font-size: 0.85rem; }
-.btn[disabled] { opacity: 0.55; cursor: not-allowed; }
+.btn[disabled] { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
 
 .detail {
-  border: 1px solid var(--line); border-radius: 12px;
-  padding: 1.1rem; background: var(--card);
+  border-radius: 12px; box-shadow: var(--shadow-out);
+  padding: 1.1rem; background: var(--surface);
   position: sticky; top: 5.5rem;
 }
 .detail-head { margin: 0.3rem 0; font-size: 1.05rem; }
@@ -224,27 +235,22 @@ tbody tr:hover { background: var(--well); }
 .results { list-style: none; padding: 0; margin: 0.6rem 0 0; display: flex; flex-direction: column; gap: 0.5rem; }
 .results button {
   width: 100%; text-align: left; font-family: var(--font); font-size: 0.95rem; color: var(--text);
-  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-  min-height: 48px; padding: 0.6rem 0.8rem; cursor: pointer;
+  background: var(--surface); border: 0; border-radius: var(--radius);
+  box-shadow: var(--shadow-out-sm); min-height: 48px; padding: 0.6rem 0.8rem; cursor: pointer;
 }
-.results button:hover { background: var(--well); }
-/* Highlight: the picked result presses into the surface; the inset shadow
-   replaces the border here (border and shadow never stack). */
-.results button[aria-selected="true"] {
-  background: var(--primary-tint);
-  border-color: transparent;
-  box-shadow: var(--shadow-in);
-}
+.results button:hover { box-shadow: var(--shadow-out); }
+.results button[aria-selected="true"] { background: var(--primary-tint); box-shadow: var(--shadow-in); }
 .results .r-meta { color: var(--muted); font-size: 0.85rem; }
 
 .selected { margin-top: 1.25rem; border-top: 2px solid var(--line); padding-top: 0.75rem; }
 .stack { display: flex; flex-direction: column; }
 aside[aria-label="Register"] {
-  border: 1px solid var(--line); border-radius: 12px; padding: 1.1rem; background: var(--card);
+  border-radius: 12px; box-shadow: var(--shadow-out); padding: 1.1rem; background: var(--surface);
 }
 
 .banner {
-  margin-top: 1.1rem; border: 1px solid var(--primary); border-radius: var(--radius);
+  margin-top: 1.1rem; border: 0; border-radius: var(--radius);
+  box-shadow: var(--shadow-out-sm);
   background: var(--primary-tint); color: var(--text); padding: 0.9rem 1.1rem;
 }
 .banner strong { display: block; margin-bottom: 0.2rem; font-size: 1.05rem; }
@@ -262,19 +268,17 @@ aside[aria-label="Register"] {
   main.wrap > h1 { font-size: 1.75rem; }
   .split { grid-template-columns: 1fr; }
   .detail { position: static; }
-  main.wrap { padding: 1.1rem; border-radius: 0; border-left: 0; border-right: 0; margin-top: 0; }
+  main.wrap { padding: 1.1rem; border-radius: 0; box-shadow: none; margin-top: 0; }
   .topbar-inner { min-height: 64px; }
 }
 
 /* Guided tour: spotlight cutout dims the page; tooltip carries the lesson.
    Layers never intercept clicks, so users can keep exploring mid-tour.
-   These two are the only shadow-bearers on the site: the ring is a highlight,
-   the tooltip is the modal. */
+   Ring and tooltip share one soft-lift shadow language; neither has a stroke. */
 .tour-spot {
   position: fixed; z-index: 201; pointer-events: none;
   border: 3px solid var(--primary); border-radius: 12px;
-  box-shadow: 0 0 0 9999px rgba(20, 26, 34, 0.55),
-    8px 8px 24px rgba(20, 26, 34, 0.45);
+  box-shadow: 0 0 0 9999px rgba(20, 26, 34, 0.55), var(--shadow-lift-sm);
   transition: left 200ms ease-out, top 200ms ease-out, width 200ms ease-out, height 200ms ease-out;
 }
 .tour-tip {
@@ -282,7 +286,7 @@ aside[aria-label="Register"] {
   background: var(--surface); color: var(--text);
   border: 0;
   border-radius: 12px;
-  box-shadow: var(--shadow-out);
+  box-shadow: var(--shadow-lift);
   padding: 1.1rem 1.2rem;
 }
 .tour-tip h2 { font-size: 1.2rem; letter-spacing: -0.01em; margin: 0.15rem 0 0.45rem; }
