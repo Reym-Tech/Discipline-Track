@@ -59,12 +59,14 @@ docs/DESIGN.md       Seam placement, sync rule, honest trade-offs
 
 Two screens sharing the same JSON file as the terminal, so both stay in sync:
 
-* `/` — Audit: demerit-ordered table, severity/row-limit filter, per-row
+* `/` — Audit: demerit-ordered table, minimum-demerits filter with
+  whole-number validation, first 10 matches shown; per-row
   detail panel with violation history. Empty, loading, and error states inline.
 * `/log` — Log violation: search-as-you-type by name or ID, violation picker
   from the catalog, instant consequence banner; inline registration form.
 
-JSON endpoints: `GET /api/audit?min_demerits=&limit=`,
+JSON endpoints: `GET /api/audit?min_demerits=&limit=` (defaults: min 0,
+limit 10; min must be 0 or higher),
 `GET /api/students?q=`, `GET /api/students/<id>`,
 `POST /api/students`, `POST /api/violations`.
 Errors map 1:1 from the ledger (400 bad code/payload, 404 unknown student,

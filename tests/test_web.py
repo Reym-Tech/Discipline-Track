@@ -90,6 +90,34 @@ def test_audit_filter_and_limit(client):
     assert limited["total"] == 2
 
 
+def test_audit_defaults_to_ten_rows(client):
+    for i in range(12):
+        _register(client, 2000 + i, f"Student {i}")
+    body = client.get("/api/audit").get_json()
+    assert body["total"] == 12
+    assert body["returned"] == 10
+    assert len(body["students"]) == 10
+
+
+def test_audit_rejects_bad_min_demerits(client):
+    assert client.get("/api/audit?min_demerits=-1").status_code == 400
+    assert client.get("/api/audit?min_demerits=abc").status_code == 400
+    assert client.get("/api/audit?min_demerits=2.5").status_code == 400
+
+
+def test_audit_page_has_no_row_limit_input(client):
+    html = client.get("/").data
+    assert b'id="limit"' not in html
+    assert b'id="min"' in html
+
+
+def test_audit_page_renders_at_most_ten_rows(client):
+    for i in range(12):
+        _register(client, 3000 + i, f"Student {i}")
+    html = client.get("/").data
+    assert html.count(b"<tr data-sid=") == 10
+
+
 def test_student_search_by_name_and_id(client):
     _register(client, 1001, "Ada Lovelace")
     _register(client, 1002, "Bob Santos")

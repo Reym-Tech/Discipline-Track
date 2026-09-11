@@ -33,8 +33,14 @@
 
     filterForm.addEventListener("submit", function (ev) {
       ev.preventDefault();
-      var min = document.getElementById("min").value || "0";
-      var limit = document.getElementById("limit").value || "500";
+      var rawMin = document.getElementById("min").value.trim();
+      if (rawMin === "") rawMin = "0";
+      if (!/^\d+$/.test(rawMin)) {
+        show(document.getElementById("filter-error"), "Minimum demerits must be a whole number, 0 or higher.");
+        return;
+      }
+      var min = rawMin;
+      var limit = "10";
       show(document.getElementById("filter-error"), "");
       auditBody.innerHTML = '<tr><td colspan="6" class="empty">Loading filtered records…</td></tr>';
       fetch("/api/audit?min_demerits=" + encodeURIComponent(min) + "&limit=" + encodeURIComponent(limit))
@@ -57,7 +63,7 @@
           matchCount.textContent = body.total;
           var capped = body.returned < body.total;
           tableNote.hidden = !capped;
-          if (capped) tableNote.textContent = "Showing " + body.returned + " of " + body.total + " matches; raise the row limit to see more.";
+          if (capped) tableNote.textContent = "Showing " + body.returned + " of " + body.total + " matches; the audit shows the first 10 — raise the minimum to narrow the list.";
         })
         .catch(function (err) { show(document.getElementById("filter-error"), err.message); });
     });

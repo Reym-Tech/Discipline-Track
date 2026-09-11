@@ -17,8 +17,9 @@ from src.ledger import DisciplineLedger, DuplicateStudentError, StudentNotFoundE
 from src.models import StudentRecord
 from src.stores import DEFAULT_PATH, load_json, save_json
 
-SERVER_RENDER_CAP = 500
+SERVER_RENDER_CAP = 10
 SEARCH_CAP = 10
+AUDIT_DEFAULT_LIMIT = 10
 AUDIT_LIMIT_CAP = 5000
 
 
@@ -75,9 +76,11 @@ def create_app(data_path: str = DEFAULT_PATH) -> Flask:
     def api_audit():
         try:
             min_demerits = int(request.args.get("min_demerits", 0))
-            limit = int(request.args.get("limit", 500))
+            limit = int(request.args.get("limit", AUDIT_DEFAULT_LIMIT))
         except (TypeError, ValueError):
             return jsonify(error="min_demerits and limit must be integers"), 400
+        if min_demerits < 0:
+            return jsonify(error="min_demerits must be 0 or higher"), 400
         limit = max(1, min(limit, AUDIT_LIMIT_CAP))
         matching = ledger().list_by_severity(min_demerits)
         return jsonify(
