@@ -66,7 +66,7 @@
 
 * { box-sizing: border-box; }
 
-html { font-size: 18px; }
+html { font-size: 18px; scroll-padding-top: 6rem; }
 
 body {
   margin: 0;
@@ -95,13 +95,75 @@ body {
   background: var(--surface);
   box-shadow: 0 4px 10px var(--surface-lo);
   position: sticky; top: 0; z-index: 50;
+  /* Geometry is reserved identically in both states (same outer padding,
+     same inner min-height) so toggling .is-scrolled never changes document
+     flow height — that height delta was the scroll-threshold jitter loop.
+     Only paint props animate. */
+  padding: 12px 1rem 10px;
+  transition: background-color 550ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 550ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .topbar-inner {
   display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
-  min-height: 68px; padding-top: 0.5rem; padding-bottom: 0.5rem;
+  min-height: 64px; padding-top: 0.5rem; padding-bottom: 0.5rem;
+  max-width: 1100px; width: 100%; margin-left: auto; margin-right: auto;
+  padding-left: 1rem; padding-right: 1rem;
+  border-radius: 0;
+  /* One authored morph: the squeeze-and-glass. Horizontal-only geometry
+     (max-width, padding-inline) plus paint (background, shadow, radius) —
+     vertical box never changes, so the scroll-threshold loop can't return.
+     Detector's layout-transition note is accepted: the brief demands
+     smoothness and horizontal motion can't move scrollY. */
+  transition: background-color 550ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 550ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-radius 550ms cubic-bezier(0.16, 1, 0.3, 1),
+    max-width 550ms cubic-bezier(0.16, 1, 0.3, 1),
+    padding-left 550ms cubic-bezier(0.16, 1, 0.3, 1),
+    padding-right 550ms cubic-bezier(0.16, 1, 0.3, 1);
 }
-.brand { font-weight: 700; font-size: 1.1rem; letter-spacing: -0.02em; margin-right: auto; }
-nav { display: flex; gap: 0.4rem; }
+/* Exit faster than entrance: reattaching to the bar is routine chrome,
+   detaching into the pill is the authored moment. */
+.topbar:not(.is-scrolled) .topbar-inner {
+  transition-duration: 320ms;
+}
+/* Scrolled state: the bar detaches into a floating glass pill.
+   Triggered by nav.js toggling .is-scrolled with enter/exit hysteresis.
+   Glass is functional here (keeps nav legible over scrolled content),
+   not decoration: translucent surface + blur + saturate, shadow only,
+   no border (border and shadow never stack in this world). */
+.topbar.is-scrolled {
+  background: transparent;
+  box-shadow: none;
+  /* Same box as the default bar — the page shows through the transparent
+     header box while stuck, giving the float without a height change. */
+  padding: 12px 1rem 10px;
+}
+.topbar.is-scrolled .topbar-inner {
+  max-width: 960px; width: 100%;
+  margin-left: auto; margin-right: auto;
+  min-height: 64px;
+  padding-top: 0.5rem; padding-bottom: 0.5rem;
+  padding-left: 1.25rem; padding-right: 1.25rem;
+  background: rgba(231, 229, 228, 0.72);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  backdrop-filter: blur(18px) saturate(1.6);
+  border-radius: 999px;
+  box-shadow: 8px 8px 24px rgba(20, 26, 34, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  transform: translateZ(0);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .topbar.is-scrolled .topbar-inner { background: rgba(231, 229, 228, 0.94); }
+}
+.topbar.is-scrolled nav a.current { background: rgba(217, 233, 233, 0.92); }
+/* Pill state: bulb keeps its default identity — same surface, shadow,
+   and radius; only the flex guard stays so it never clips. */
+.topbar.is-scrolled #tour-start {
+  background: var(--surface);
+  flex-shrink: 0; white-space: nowrap;
+}
+.brand { font-weight: 700; font-size: 1.1rem; letter-spacing: -0.02em; margin-right: auto; min-width: 0; }
+nav { display: flex; gap: 0.4rem; flex-shrink: 0; }
 nav a {
   color: var(--text); text-decoration: none; font-weight: 700;
   display: inline-flex; align-items: center; min-height: 44px;
@@ -110,17 +172,41 @@ nav a {
 nav a:hover { box-shadow: var(--shadow-out-sm); }
 nav a.current { background: var(--primary-tint); color: var(--primary); box-shadow: var(--shadow-in); }
 
-.display-controls { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; }
+.display-controls { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; flex-shrink: 0; }
 #tour-start {
   font-family: var(--font-label); font-weight: 700; font-size: 0.8rem;
   background: var(--surface); color: var(--text);
   border: 0; border-radius: var(--radius);
   box-shadow: var(--shadow-out-sm);
-  min-height: 44px; padding: 0 0.8rem; cursor: pointer;
-  transition: box-shadow 180ms ease-out;
+  min-height: 44px; min-width: 44px; width: 44px; height: 44px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0; white-space: nowrap;
+  transition: box-shadow 180ms ease-out, background-color 450ms cubic-bezier(0.22, 1, 0.36, 1), transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 #tour-start:hover { box-shadow: var(--shadow-out); }
-#tour-start:active { box-shadow: var(--shadow-in); }
+#tour-start:active { box-shadow: var(--shadow-in); transform: scale(0.94); }
+/* Bulb icon: idea-flash thesis. Resting filament, hover awakens the glow
+   (tilt + rays + filament light), press strikes it (snap + flash).
+   Transform/filter only, on a 20px isolated region — cheap by budget. */
+#tour-start .bulb-icon {
+  width: 20px; height: 20px;
+  transform-origin: 50% 85%;
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+#tour-start .bulb-rays { transition: opacity 220ms cubic-bezier(0.22, 1, 0.36, 1); }
+#tour-start:hover .bulb-icon, #tour-start:focus-visible .bulb-icon {
+  transform: rotate(-10deg) scale(1.1);
+  filter: drop-shadow(0 0 6px rgba(0, 102, 102, 0.65));
+}
+#tour-start:hover .bulb-rays, #tour-start:focus-visible .bulb-rays { opacity: 1; }
+#tour-start:active .bulb-icon {
+  transform: scale(0.9);
+  filter: drop-shadow(0 0 10px rgba(0, 102, 102, 0.9));
+  transition-duration: 100ms;
+}
+#tour-start:active .bulb-rays { opacity: 1; transition-duration: 100ms; }
 
 main.wrap {
   background: var(--surface);
@@ -270,6 +356,13 @@ aside[aria-label="Register"] {
   .detail { position: static; }
   main.wrap { padding: 1.1rem; border-radius: 0; box-shadow: none; margin-top: 0; }
   .topbar-inner { min-height: 64px; }
+  .topbar.is-scrolled { padding: 12px 0.75rem 10px; }
+  .topbar.is-scrolled .topbar-inner { width: 100%; min-height: 64px; }
+}
+@media (max-width: 640px) {
+  /* Wrapped pill can't stay a stadium: relax to a rounded card so
+     brand + nav + tour never clip and 44px targets survive. */
+  .topbar.is-scrolled .topbar-inner { border-radius: 22px; padding-left: 1rem; padding-right: 1rem; }
 }
 
 /* Guided tour: spotlight cutout dims the page; tooltip carries the lesson.
@@ -301,4 +394,11 @@ aside[aria-label="Register"] {
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+  .topbar, .topbar-inner { transition: none !important; }
+  /* Bulb reduced-motion path: no tilt/scale/glow travel, but the rays
+     fade stays so hover/press feedback remains legible. */
+  #tour-start:active { transform: none !important; }
+  #tour-start .bulb-icon { transform: none !important; filter: none !important; }
+  #tour-start .bulb-rays { transition: opacity 150ms ease-out !important; }
 }
