@@ -1,5 +1,8 @@
-/* Discipline-Track web: flat Neumorphism-club tokens, elevation via border.
+/* Discipline-Track web: Neumorphism-club world (.agents/frontend), restrained.
    Tokens: primary #006666, secondary #F1F2F5, surface #E7E5E4, text #1E2938.
+   Elevation is flat 1px borders everywhere EXCEPT the modal (tour tooltip)
+   and highlights (tour spotlight ring, selected search result), which carry
+   the club's soft extruded/pressed shadows. Border and shadow never stack.
    Every text/background pair verified >= 4.5:1 (see scripts/check_contrast.py).
    Type: Space Mono (display/body), JetBrains Mono (labels/data captions). */
 @font-face {
@@ -33,6 +36,8 @@
 
 :root {
   --surface: #E7E5E4;
+  --surface-hi: #FFFFFF;
+  --surface-lo: #C6C2BE;
   --card: #FFFFFF;
   --well: #F1F2F5;
   --text: #1E2938;
@@ -45,6 +50,9 @@
   --danger-deep: #8F1030;
   --expel-deep: #6E0B24;
   --error: #A3133C;
+  --shadow-out: 6px 6px 12px var(--surface-lo), -6px -6px 12px var(--surface-hi);
+  --shadow-out-sm: 3px 3px 7px var(--surface-lo), -3px -3px 7px var(--surface-hi);
+  --shadow-in: inset 3px 3px 6px var(--surface-lo), inset -3px -3px 6px var(--surface-hi);
   --font: "Space Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
   --font-label: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
   --radius: 8px;
@@ -220,7 +228,13 @@ tbody tr:hover { background: var(--well); }
   min-height: 48px; padding: 0.6rem 0.8rem; cursor: pointer;
 }
 .results button:hover { background: var(--well); }
-.results button[aria-selected="true"] { background: var(--primary-tint); border: 2px solid var(--primary); }
+/* Highlight: the picked result presses into the surface; the inset shadow
+   replaces the border here (border and shadow never stack). */
+.results button[aria-selected="true"] {
+  background: var(--primary-tint);
+  border-color: transparent;
+  box-shadow: var(--shadow-in);
+}
 .results .r-meta { color: var(--muted); font-size: 0.85rem; }
 
 .selected { margin-top: 1.25rem; border-top: 2px solid var(--line); padding-top: 0.75rem; }
@@ -253,18 +267,22 @@ aside[aria-label="Register"] {
 }
 
 /* Guided tour: spotlight cutout dims the page; tooltip carries the lesson.
-   Layers never intercept clicks, so users can keep exploring mid-tour. */
+   Layers never intercept clicks, so users can keep exploring mid-tour.
+   These two are the only shadow-bearers on the site: the ring is a highlight,
+   the tooltip is the modal. */
 .tour-spot {
   position: fixed; z-index: 201; pointer-events: none;
   border: 3px solid var(--primary); border-radius: 12px;
-  box-shadow: 0 0 0 9999px rgba(20, 26, 34, 0.55);
+  box-shadow: 0 0 0 9999px rgba(20, 26, 34, 0.55),
+    8px 8px 24px rgba(20, 26, 34, 0.45);
   transition: left 200ms ease-out, top 200ms ease-out, width 200ms ease-out, height 200ms ease-out;
 }
 .tour-tip {
   position: fixed; z-index: 202;
-  background: var(--card); color: var(--text);
-  border: 1px solid var(--line);
+  background: var(--surface); color: var(--text);
+  border: 0;
   border-radius: 12px;
+  box-shadow: var(--shadow-out);
   padding: 1.1rem 1.2rem;
 }
 .tour-tip h2 { font-size: 1.2rem; letter-spacing: -0.01em; margin: 0.15rem 0 0.45rem; }
